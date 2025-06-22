@@ -1,0 +1,143 @@
+{% load static %}
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Home</title>
+    <link rel="stylesheet" href="{% static 'style.css' %}">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        .sidebar {
+            height: 100vh;
+            width: 200px;
+            position: fixed;
+            top: 56px;
+            left: 0;
+            background: #f8fafc;
+            border-right: 1px solid #e5e7eb;
+            padding-top: 20px;
+            transition: left 0.2s;
+            z-index: 1030;
+            border-top-right-radius: 18px;
+            border-bottom-right-radius: 18px;
+            box-shadow: 2px 0 12px rgba(99,102,241,0.07);
+        }
+        .sidebar a {
+            display: block;
+            padding: 12px 24px;
+            color: #374151;
+            text-decoration: none;
+            font-weight: 500;
+            transition: background 0.2s, color 0.2s;
+            border-radius: 6px 0 0 6px;
+            margin-bottom: 8px;
+            font-size: 1.08rem;
+            letter-spacing: 0.5px;
+        }
+        .sidebar a:hover {
+            background: #e0e7ff;
+            color: #4338ca;
+        }
+        .sidebar a.active, .sidebar a:focus {
+            background: linear-gradient(90deg, #6366f1 0%, #60a5fa 100%);
+            color: #fff !important;
+        }
+        .sidebar a i {
+            margin-right: 10px;
+        }
+        .sidebar-toggle {
+            border: none;
+            background: transparent;
+            font-size: 1.5rem;
+            margin-right: 16px;
+            color: #6366f1;
+            border-radius: 6px;
+            background: #f1f5f9;
+            box-shadow: 0 2px 6px rgba(99,102,241,0.08);
+        }
+        .sidebar-toggle:active {
+            background: #e0e7ff;
+        }
+        .content {
+            margin-left: 220px;
+            padding: 40px 20px 20px 20px;
+            background: #f8fafc;
+            border-radius: 18px;
+            min-height: 80vh;
+            box-shadow: 0 2px 12px rgba(99,102,241,0.04);
+        }
+        @media (max-width: 768px) {
+            .sidebar {
+                left: -220px;
+            }
+            .sidebar.show {
+                left: 0;
+            }
+            .content {
+                margin-left: 0;
+                padding-top: 80px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-white shadow-sm fixed-top">
+        <div class="container-fluid">
+            <button class="sidebar-toggle d-lg-none" onclick="toggleSidebar()" aria-label="Toggle sidebar">&#9776;</button>
+            <a class="navbar-brand fw-bold text-primary" href="#" style="font-size:1.5rem;letter-spacing:1px;">COPO</a>
+            <div>
+                {% if user.is_authenticated %}
+                    <span class="me-3 text-primary fw-semibold">Hello, {{ user.username }}</span>
+                    <a href="{% url 'logout' %}" class="btn btn-danger btn-sm px-3 py-1">Logout</a>
+                {% else %}
+                    <a href="{% url 'register' %}" class="register-link btn btn-success btn-sm px-3 py-1 me-2">Register</a>
+                    <a href="{% url 'login' %}" class="login-link btn btn-primary btn-sm px-3 py-1">Login</a>
+                {% endif %}
+            </div>
+        </div>
+    </nav>
+    <!-- Sidebar -->
+    <div id="sidebar" class="sidebar d-none d-lg-block">
+        <a href="#" class="active"><i class="bi bi-house-door"></i>Dashboard</a>
+        <a href="#"><i class="bi bi-person"></i>Profile</a>
+        <a href="#"><i class="bi bi-gear"></i>Settings</a>
+        <a href="#"><i class="bi bi-question-circle"></i>Help</a>
+        <!-- Add more links as needed -->
+    </div>
+    <!-- Mobile Sidebar -->
+    <div id="sidebarMobile" class="sidebar d-lg-none" style="left:-220px;">
+        <a href="#" class="active"><i class="bi bi-house-door"></i>Dashboard</a>
+        <a href="#"><i class="bi bi-person"></i>Profile</a>
+        <a href="#"><i class="bi bi-gear"></i>Settings</a>
+        <a href="#"><i class="bi bi-question-circle"></i>Help</a>
+    </div>
+    <!-- Main Content -->
+    <div class="content" style="position:relative; z-index:1; margin-top:76px;">
+        <h1 class="mb-4">helooooo <span class="text-primary">{{ user }}</span></h1>
+        {% if user.is_authenticated %}
+            <a href="{% url 'add_course' %}" class="btn btn-outline-primary me-2 mb-2">Add Course</a>
+            <a href="{% url 'add_cos' %}" class="btn btn-outline-info me-2 mb-2">Add COS</a>
+            <a href="{% url 'add_pos' %}" class="btn btn-outline-success me-2 mb-2">Add POS</a>
+            <a href="{% url 'course_list' %}" class="btn btn-outline-dark me-2 mb-2">View Courses</a>
+            <a href="{% url 'enter_matrix' course_id=1 %}" class="btn btn-outline-warning me-2 mb-2">Enter CO-PO Matrix</a>
+            <a href="{% url 'logout' %}" class="btn btn-danger mb-2">Logout</a>
+        {% else %}
+            <a href="{% url 'register' %}" class="register-link btn btn-success me-2">Register</a>
+            <a href="{% url 'login' %}" class="login-link btn btn-primary">Login</a>
+        {% endif %}
+    </div>
+    <!-- Bootstrap Icons CDN -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script>
+        function toggleSidebar() {
+            var sidebar = document.getElementById('sidebarMobile');
+            if (sidebar.style.left === '0px') {
+                sidebar.style.left = '-220px';
+            } else {
+                sidebar.style.left = '0px';
+            }
+        }
+    </script>
+</body>
+</html>
