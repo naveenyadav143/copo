@@ -1,0 +1,61 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>CO-PO Dashboard</title>
+  <link rel="stylesheet" href="{% static 'styles.css' %}">
+</head>
+<body>
+
+  <!-- Top Navbar -->
+  <header class="navbar">
+    <div class="logo">CO-PO Calculator</div>
+    <div>
+        {% if user.is_authenticated %}
+            <span class="username">Welcome {{ user.username }}</span>
+            <a href="{% url 'logout' %}" class="btn" style="margin-left:16px;">Logout</a>
+        {% else %}
+            <a href="{% url 'login' %}" class="btn" style="margin-left:16px;">Login</a>
+        {% endif %}
+        
+     
+      <a href="{% url 'register' %}" class="btn" style="margin-left:8px; background:#28a745;">Register</a>
+    </div>
+  </header>
+
+  <!-- Sidebar -->
+  <div class="sidebar">
+    <a href="{% url 'home'%}">Dashboard</a>
+    <a href="{% url 'add_course'%}">Add Course</a>
+    <a href="{%url 'add_co'%}">Add CO</a>
+    <a href="{%url 'add_po'%}">Add PO</a>
+    <a href="{%url 'add_mapping'%}">CO-PO Mapping</a>
+   <a href="{% url 'upload_marks'%}">Enter Marks</a>
+    <a href="{% url 'co_attainment'%}">CO Attainment</a>
+    <a href ="{% url 'po_attainment'%}">PO Attainment</a>
+  </div>
+
+  <!-- Page Content -->
+
+<main>
+  
+
+    {% block content %}
+      {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-info">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+
+    <!-- Default content can go here -->
+    {% endblock %}
+
+</main>
+</body>
+</html>
+

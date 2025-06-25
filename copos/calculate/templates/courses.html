@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}All Courses{% endblock %}
+{% block content %}
+<div class="content">
+    
+    <h2 class="mb-4" style="color:#004c99;font-weight:600;">All Courses</h2>
+    <ul class="list-group mb-3">
+        {% for course in courses %}
+            <li class="list-group-item">
+                <strong>{{ course.code }}</strong>: {{ course.name }}
+            </li>
+        {% empty %}
+            <li class="list-group-item">No courses available.</li>
+        {% endfor %}
+    </ul>
+</div>
+{% endblock %}

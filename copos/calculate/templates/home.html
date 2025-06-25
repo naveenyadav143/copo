@@ -1,0 +1,18 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="content">
+  
+  
+      {% if messages %}
+  {% for message in messages %}
+    <div class="alert alert-info">{{ message }}</div>
+  {% endfor %}
+{% endif %}
+  {% if error %}
+    <div class="alert alert-danger">{{ error }}</div>
+  {% endif %}
+  <h1>Hello {{ user }}</h1>
+  <a href="{% url 'courses' %}" id="showCoursesBtn" class="btn btn-primary mt-3" style="background:linear-gradient(90deg,#004c99 60%,#0074d9 100%);border:none;font-weight:500;">Show All Courses</a>
+</div>
+{% endblock %}
