@@ -1,4 +1,11 @@
-startCommand: gunicorn copos.wsgi:application
-envVars:
-  - key: DJANGO_SETTINGS_MODULE
-    value: copos.settings
+services:
+  - type: web
+    name: copo-calculator
+    env: python
+    buildCommand: pip install -r requirements.txt
+    startCommand: gunicorn copos.wsgi:application
+    branch: main
+    autoDeploy: true
+    envVars:
+      - key: DJANGO_SETTINGS_MODULE
+        value: copos.settings
