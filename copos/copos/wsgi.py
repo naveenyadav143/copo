@@ -14,3 +14,7 @@ from django.core.wsgi import get_wsgi_application
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'copos.settings')
 
 application = get_wsgi_application()
+
+# Add WhiteNoise for static files on Render
+from whitenoise import WhiteNoise
+application = WhiteNoise(application)
