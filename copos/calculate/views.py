@@ -3,9 +3,10 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Course, CO, PO, COPOMapping, COAttainment, StudentMark
+from .models import Course, CO, PO, COPOMapping, COAttainment, StudentMark,Student
 from django.contrib.auth.models import User
 from openpyxl import load_workbook
+from collections import defaultdict
 
 # Create your views here.
 def home(request):
@@ -129,24 +130,73 @@ def add_po(request):
 
 def add_mapping(request):
     if request.method == 'POST':
+        processed = False
+        course_id = request.POST.get('course')
+        if not course_id:
+            messages.error(request, "Course selection is required for mapping.")
+            return redirect('add_mapping')
+
+        # Excel upload
+        excel_file = request.FILES.get('excel_file')
+        if excel_file:
+            try:
+                wb = load_workbook(excel_file)
+                sheet = wb.active
+
+                # Read PO headers from first row (skip first column)
+                po_headers = [str(cell.value).strip().upper() for cell in sheet[1][1:]]
+
+                # Prepare PO and CO objects for fast lookup
+                po_map = {po.number.upper(): po for po in PO.objects.all()}
+                co_map = {co.number.upper(): co for co in CO.objects.filter(course_id=course_id)}
+
+                for row in sheet.iter_rows(min_row=2, values_only=True):
+                    co_key = str(row[0]).strip().upper()
+                    co = co_map.get(co_key)
+
+                    if not co:
+                        continue
+
+                    for i, level in enumerate(row[1:]):
+                        po_key = po_headers[i]
+                        po = po_map.get(po_key)
+
+                        if po and level:
+                            COPOMapping.objects.update_or_create(
+                                co=co,
+                                po=po,
+                                defaults={'level': int(level)}
+                            )
+                messages.success(request, "CO-PO mappings updated from Excel file!")
+                processed = True
+
+            except Exception as e:
+                messages.error(request, f"Failed to process Excel file: {e}")
+                processed = True
+
+        # Manual form mapping (unchanged)
         co_id = request.POST.get('co')
         po_id = request.POST.get('po')
         level = request.POST.get('level')
+        if co_id and po_id and level:
+            try:
+                co = CO.objects.get(id=co_id, course_id=course_id)
+                po = PO.objects.get(id=po_id)
+                COPOMapping.objects.create(
+                    co=co,
+                    po=po,
+                    level=level
+                )
+                messages.success(request, "CO-PO mapping added successfully!")
+                processed = True
+            except (CO.DoesNotExist, PO.DoesNotExist):
+                messages.error(request, "Invalid CO or PO selected.")
+                processed = True
 
-        try:
-            co = CO.objects.get(id=co_id)
-            po = PO.objects.get(id=po_id)
-
-            COPOMapping.objects.create(
-                co=co,
-                po=po,
-                level=level
-            )
-            messages.success(request, "CO-PO mapping added successfully!")
+        if processed:
             return redirect('add_mapping')
-
-        except (CO.DoesNotExist, PO.DoesNotExist):
-            messages.error(request, "Invalid CO or PO selected.")
+        else:
+            messages.warning(request, "No mapping data provided.")
 
     cos = CO.objects.filter(course__user=request.user)
     pos = PO.objects.all()
@@ -163,7 +213,6 @@ def upload_marks(request):
 
         try:
             course = Course.objects.get(id=course_id)
-            # Normalize CO numbers for consistent matching
             cos = {co.number.strip().upper(): co for co in CO.objects.filter(course=course)}
         except Course.DoesNotExist:
             messages.error(request, "Invalid course selected.")
@@ -172,7 +221,9 @@ def upload_marks(request):
         try:
             wb = load_workbook(excel_file)
             sheet = wb.active
-            header = [str(cell.value).strip().upper() for cell in sheet[1]]
+
+            # ✅ Skip merged evaluation row (1st row), read header from row 2
+            header = [str(cell.value).strip().upper() for cell in sheet[2]]
             co_headers = header[2:]  # Skip Roll No and Name
         except Exception as e:
             messages.error(request, f"Failed to read Excel file: {e}")
@@ -181,25 +232,47 @@ def upload_marks(request):
         created_count = 0
         updated_count = 0
 
-        for row in sheet.iter_rows(min_row=2, values_only=True):
+        # ✅ Start reading from row 3
+        for row in sheet.iter_rows(min_row=3, values_only=True):
             if not row or row[0] is None:
-                continue  # Skip empty rows
+                continue
 
             roll_no, name, *marks = row
+            roll_no = str(roll_no).strip()
+            name = str(name).strip()
+
             if not roll_no or not name:
                 continue
 
+            student, _ = Student.objects.get_or_create(
+                roll_number=roll_no,
+                defaults={'name': name}
+            )
+            if student.name != name:
+                student.name = name
+                student.save()
+
+            # ✅ 1. Sum all marks by CO number
+            co_marks_sum = defaultdict(float)
             for i, co_name in enumerate(co_headers):
-                co = cos.get(co_name.strip().upper())
-                if co and i < len(marks) and marks[i] is not None:
+                co_key = co_name.strip().upper()
+                if i < len(marks) and marks[i] is not None:
+                    try:
+                        co_marks_sum[co_key] += float(marks[i])
+                    except ValueError:
+                        continue
+
+            # ✅ 2. Save summed marks for each CO
+            for co_key, total_obtained in co_marks_sum.items():
+                co = cos.get(co_key)
+                if co:
                     obj, created = StudentMark.objects.update_or_create(
                         course=course,
                         co=co,
-                        roll_number=str(roll_no).strip(),
+                        student=student,
                         defaults={
-                            'student_name': str(name).strip(),
-                            'obtained_marks': float(marks[i]),
-                            'total_marks': 100
+                            'obtained_marks': total_obtained,
+                            'total_marks': co.max_score  # Optional: You can update this logic
                         }
                     )
                     if created:
@@ -207,50 +280,70 @@ def upload_marks(request):
                     else:
                         updated_count += 1
 
-        messages.success(request, f"{created_count} records created, {updated_count} updated successfully.")
+        messages.success(request, f"{created_count} new records, {updated_count} updated.")
         return redirect('upload_marks')
 
     return render(request, 'upload_marks.html', {'courses': courses})
-   
+
+@login_required
 def co_attainment_view(request):
     selected_course_id = request.GET.get('course_id')
     courses = Course.objects.filter(user=request.user)
     attainment_data = []
     selected_course = None
+    overall_level_avg = 0
 
     if selected_course_id:
-        selected_course = get_object_or_404(Course, id=selected_course_id)
+        selected_course = get_object_or_404(Course, id=selected_course_id, user=request.user)
         cos = CO.objects.filter(course=selected_course)
 
+        total_level = 0
+        co_count = 0
+
         for co in cos:
-            marks = StudentMark.objects.filter(course=selected_course, co=co)
-            total_obtained = sum(m.obtained_marks for m in marks)
-            # Use co.max_score (or co.max_marks) for each student
-            total_possible = marks.count() * float(getattr(co, 'max_score', getattr(co, 'max_marks', 0)))
+            student_marks = StudentMark.objects.filter(course=selected_course, co=co)
+            levels = []
 
-            attainment_percent = 0
-            if total_possible > 0:
-                attainment_percent = round((total_obtained / total_possible) * 100, 2)
+            for mark in student_marks:
+                if mark.total_marks > 0:
+                    percent = (mark.obtained_marks / mark.total_marks) * 100
+                    if percent >= 60:
+                        levels.append(3)
+                    elif percent > 40:
+                        levels.append(2)
+                    else:
+                        levels.append(1)
 
-            # Save or update attainment in DB
+            if levels:
+                avg_level = round(sum(levels) / len(levels), 2)
+            else:
+                avg_level = 0
+
+            total_level += avg_level
+            co_count += 1
+
+            # ✅ Save only average level
             COAttainment.objects.update_or_create(
                 course=selected_course,
                 co=co,
-                defaults={'attainment_percentage': attainment_percent}
+                defaults={'level_avg': avg_level}
             )
 
             attainment_data.append({
                 'co_number': co.number,
                 'co_description': co.description,
-                'attainment': attainment_percent
+                'level': avg_level
             })
+
+        if co_count > 0:
+            overall_level_avg = round(total_level / co_count, 2)
 
     return render(request, 'co_attainment.html', {
         'courses': courses,
         'selected_course': selected_course,
-        'attainment_data': attainment_data
+        'attainment_data': attainment_data,
+        'average_level': overall_level_avg
     })
-
 
 def calculate_po_attainment(request):
     selected_course_id = request.GET.get('course_id')
@@ -270,7 +363,7 @@ def calculate_po_attainment(request):
             for co in cos:
                 try:
                     mapping = COPOMapping.objects.get(co=co, po=po)
-                    attainment = COAttainment.objects.get(co=co, course=selected_course).attainment_percentage
+                    attainment = COAttainment.objects.get(co=co, course=selected_course).level_avg
                     total_score += attainment * mapping.level
                     total_weight += mapping.level
                 except (COPOMapping.DoesNotExist, COAttainment.DoesNotExist):

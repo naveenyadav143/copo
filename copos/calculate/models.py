@@ -1,7 +1,7 @@
 from django.db import models
 
 class PO(models.Model):
-    number = models.CharField(max_length=10)  # e.g., PO1
+    number = models.CharField(max_length=10)  
     description = models.TextField()
 
     def __str__(self):
@@ -30,15 +30,24 @@ class COPOMapping(models.Model):
     level = models.IntegerField(choices=[(1, 'Low'), (2, 'Medium'), (3, 'High')])
 
 class COAttainment(models.Model):
-    co = models.ForeignKey(CO, on_delete=models.CASCADE)
-    attainment_percentage = models.FloatField()
-    course = models.ForeignKey(Course, on_delete=models.CASCADE)
+    course = models.ForeignKey('Course', on_delete=models.CASCADE)
+    co = models.ForeignKey('CO', on_delete=models.CASCADE)
+    level_avg = models.FloatField(default=0)  # Store average level (1–3)
+
+    def __str__(self):
+        return f"{self.course.code} - {self.co.number} | Level Avg: {self.level_avg}"
+
+class Student(models.Model):
+    roll_number = models.CharField(max_length=20, unique=True)
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return f"{self.roll_number} - {self.name}"
 
 class StudentMark(models.Model):
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     co = models.ForeignKey(CO, on_delete=models.CASCADE)
-    roll_number = models.CharField(max_length=20)
-    student_name = models.CharField(max_length=100)
+    student = models.ForeignKey(Student, on_delete=models.CASCADE)
     obtained_marks = models.FloatField()
     total_marks = models.FloatField()
 
@@ -48,6 +57,4 @@ class StudentMark(models.Model):
         return round((self.obtained_marks / self.total_marks) * 100, 2)
 
     def __str__(self):
-        return f"{self.roll_number} - {self.co.number}: {self.obtained_marks}/{self.total_marks}"
-
-
+        return f"{self.student.roll_number} - {self.co.number}: {self.obtained_marks}/{self.total_marks}"
