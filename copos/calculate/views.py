@@ -3,10 +3,12 @@ from django.contrib.auth import authenticate, login, logout
 from .forms import RegisterForm
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
-from .models import Course, CO, PO, COPOMapping, COAttainment, StudentMark,Student
+from .models import Course, CO, PO, COPOMapping, COAttainment, Student, StudentTotal, StudentMark, COAggregateScore, POAttainment
 from django.contrib.auth.models import User
 from openpyxl import load_workbook
 from collections import defaultdict
+from django.http import HttpResponse, Http404
+from statistics import mode, StatisticsError
 
 # Create your views here.
 def home(request):
@@ -128,6 +130,7 @@ def add_po(request):
     return render(request, 'add_po.html')
 
 
+@login_required
 def add_mapping(request):
     if request.method == 'POST':
         processed = False
@@ -231,6 +234,10 @@ def upload_marks(request):
 
         created_count = 0
         updated_count = 0
+        
+        # Initialize dictionaries to accumulate CO totals across all students
+        co_totals = defaultdict(lambda: {'total_obtained': 0.0, 'total_max': 0.0, 'student_count': 0})
+        processed_students = []
 
         # ✅ Start reading from row 3
         for row in sheet.iter_rows(min_row=3, values_only=True):
@@ -251,36 +258,117 @@ def upload_marks(request):
             if student.name != name:
                 student.name = name
                 student.save()
+            
+            processed_students.append(student)
 
-            # ✅ 1. Sum all marks by CO number
+            # ✅ 1. Sum all marks by CO number (run for every student)
             co_marks_sum = defaultdict(float)
             for i, co_name in enumerate(co_headers):
                 co_key = co_name.strip().upper()
                 if i < len(marks) and marks[i] is not None:
                     try:
                         co_marks_sum[co_key] += float(marks[i])
-                    except ValueError:
+                    except (ValueError, TypeError):
                         continue
 
-            # ✅ 2. Save summed marks for each CO
+            # ✅ 2. Save per-CO StudentMark rows and accumulate totals
+            total_obtained_for_student = 0.0
+            total_max_for_student = 0.0
+
             for co_key, total_obtained in co_marks_sum.items():
                 co = cos.get(co_key)
                 if co:
-                    obj, created = StudentMark.objects.update_or_create(
+                    try:
+                        obtained_val = float(total_obtained)
+                    except (ValueError, TypeError):
+                        obtained_val = 0.0
+
+                    # Calculate attainment level
+                    if co.max_score > 0:
+                        percentage = (obtained_val / co.max_score) * 100
+                        if percentage > 70:
+                            attainment_level = 3
+                        elif percentage > 50:
+                            attainment_level = 2
+                        else:
+                            attainment_level = 1
+                    else:
+                        attainment_level = 1
+
+                    # Save per-CO StudentMark with attainment level
+                    sm_obj, sm_created = StudentMark.objects.update_or_create(
                         course=course,
                         co=co,
                         student=student,
                         defaults={
-                            'obtained_marks': total_obtained,
-                            'total_marks': co.max_score  # Optional: You can update this logic
+                            'obtained_marks': obtained_val,
+                            'total_marks': co.max_score,
+                            'attainment_level': attainment_level
                         }
                     )
-                    if created:
-                        created_count += 1
-                    else:
-                        updated_count += 1
 
-        messages.success(request, f"{created_count} new records, {updated_count} updated.")
+                    # Accumulate totals for StudentTotal
+                    try:
+                        total_obtained_for_student += float(obtained_val)
+                        total_max_for_student += float(co.max_score)
+                    except (ValueError, TypeError):
+                        continue
+
+                    # Accumulate totals for CO aggregate scores
+                    co_totals[co_key]['total_obtained'] += obtained_val
+                    co_totals[co_key]['total_max'] += co.max_score
+                    co_totals[co_key]['student_count'] += 1
+
+            # ✅ 3. Update or create StudentTotal for this student and course
+            if total_max_for_student > 0:
+                st_obj, st_created = StudentTotal.objects.update_or_create(
+                    course=course,
+                    student=student,
+                    defaults={
+                        'total_obtained': total_obtained_for_student,
+                        'total_max': total_max_for_student
+                    }
+                )
+                if st_created:
+                    created_count += 1
+                else:
+                    updated_count += 1
+
+        # ✅ 4. Update CO aggregate scores across all students
+        for co_key, totals in co_totals.items():
+            co = cos.get(co_key)
+            if co:
+                COAggregateScore.objects.update_or_create(
+                    course=course,
+                    co=co,
+                    defaults={
+                        'total_obtained_marks': totals['total_obtained'],
+                        'total_max_marks': totals['total_max'],
+                        'student_count': totals['student_count']
+                    }
+                )
+
+        # ✅ 5. Calculate mode attainment level for each CO and store in COAttainment
+        for co in cos.values():
+            student_marks = StudentMark.objects.filter(course=course, co=co)
+            attainment_levels = [sm.attainment_level for sm in student_marks if sm.attainment_level is not None]
+            
+            if attainment_levels:
+                try:
+                    # Calculate mode (most frequent attainment level)
+                    mode_level = mode(attainment_levels)
+                except StatisticsError:
+                    # If there's no unique mode, use the average
+                    mode_level = round(sum(attainment_levels) / len(attainment_levels))
+                
+                # Store the mode attainment level in COAttainment
+                COAttainment.objects.update_or_create(
+                    course=course,
+                    co=co,
+                    defaults={'level_avg': mode_level}
+                )
+
+        messages.success(request, f"{created_count} new records, {updated_count} updated. CO attainment levels calculated and stored.")
         return redirect('upload_marks')
 
     return render(request, 'upload_marks.html', {'courses': courses})
@@ -304,25 +392,19 @@ def co_attainment_view(request):
             student_marks = StudentMark.objects.filter(course=selected_course, co=co)
             levels = []
 
-            for mark in student_marks:
-                if mark.total_marks > 0:
-                    percent = (mark.obtained_marks / mark.total_marks) * 100
+            for sm in student_marks:
+                if sm.total_marks > 0:
+                    percent = (sm.obtained_marks / sm.total_marks) * 100
                     if percent >= 60:
                         levels.append(3)
-                    elif percent > 40:
+                    elif percent >= 40:
                         levels.append(2)
                     else:
                         levels.append(1)
 
-            if levels:
-                avg_level = round(sum(levels) / len(levels), 2)
-            else:
-                avg_level = 0
+            avg_level = round(sum(levels) / len(levels), 2) if levels else 0
 
-            total_level += avg_level
-            co_count += 1
-
-            # ✅ Save only average level
+            # ✅ Save CO attainment
             COAttainment.objects.update_or_create(
                 course=selected_course,
                 co=co,
@@ -334,6 +416,9 @@ def co_attainment_view(request):
                 'co_description': co.description,
                 'level': avg_level
             })
+
+            total_level += avg_level
+            co_count += 1
 
         if co_count > 0:
             overall_level_avg = round(total_level / co_count, 2)
@@ -352,24 +437,55 @@ def calculate_po_attainment(request):
     selected_course = None
 
     if selected_course_id:
-        selected_course = get_object_or_404(Course, id=selected_course_id)
+        selected_course = get_object_or_404(Course, id=selected_course_id, user=request.user)
         pos = PO.objects.all()
-        cos = CO.objects.filter(course=selected_course)
+        
+        # Get CO attainments for this course
+        co_attainments = {att.co.id: att.level_avg for att in COAttainment.objects.filter(course=selected_course)}
+        
+        # Get all CO-PO mappings for this course's COs
+        course_cos = CO.objects.filter(course=selected_course)
+        mappings = COPOMapping.objects.filter(co__in=course_cos).select_related("co", "po")
+
+        # Group mappings by PO for efficient processing
+        po_mappings = defaultdict(list)
+        for mapping in mappings:
+            po_mappings[mapping.po_id].append(mapping)
 
         for po in pos:
-            total_score = 0
+            total_weighted_score = 0
             total_weight = 0
 
-            for co in cos:
-                try:
-                    mapping = COPOMapping.objects.get(co=co, po=po)
-                    attainment = COAttainment.objects.get(co=co, course=selected_course).level_avg
-                    total_score += attainment * mapping.level
-                    total_weight += mapping.level
-                except (COPOMapping.DoesNotExist, COAttainment.DoesNotExist):
-                    continue
+            # Get mappings for this PO
+            mappings_for_po = po_mappings.get(po.id, [])
+            
+            for mapping in mappings_for_po:
+                co_id = mapping.co_id
+                attainment = co_attainments.get(co_id, 0)  # Default to 0 if missing
+                
+                if attainment > 0:  # Only include if there's attainment data
+                    # Weighted score: attainment level * mapping level
+                    weighted_score = attainment * mapping.level
+                    total_weighted_score += weighted_score
+                    total_weight += mapping.level  # Use mapping level as weight
 
-            po_scores[po.number] = round(total_score / total_weight, 2) if total_weight else 0
+            # Calculate PO attainment score (weighted average)
+            if total_weight > 0:
+                # Normalize to percentage (0-100) scale
+                # Max possible: 3 (attainment) * 3 (mapping) = 9
+                # So we divide by 9 and multiply by 100 to get percentage
+                po_score = round((total_weighted_score / total_weight) * (100 / 3), 2)
+            else:
+                po_score = 0
+                
+            po_scores[po.number] = po_score
+            
+            # Store PO attainment in database
+            POAttainment.objects.update_or_create(
+                course=selected_course,
+                po=po,
+                defaults={'attainment_score': po_score}
+            )
 
     return render(request, 'po_attainment.html', {
         'courses': courses,

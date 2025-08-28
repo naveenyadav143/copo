@@ -1,18 +1,109 @@
 {% extends "base.html" %}
+{% load static %}
+
+{% block title %}Dashboard - CO-PO Calculator{% endblock %}
 
 {% block content %}
-<div class="content">
-  
-  
-      {% if messages %}
-  {% for message in messages %}
-    <div class="alert alert-info">{{ message }}</div>
-  {% endfor %}
-{% endif %}
-  {% if error %}
-    <div class="alert alert-danger">{{ error }}</div>
-  {% endif %}
-  <h1>Hello {{ user }}</h1>
-  <a href="{% url 'courses' %}" id="showCoursesBtn" class="btn btn-primary mt-3" style="background:linear-gradient(90deg,#004c99 60%,#0074d9 100%);border:none;font-weight:500;">Show All Courses</a>
+<div class="container-fluid">
+    <!-- Welcome Section -->
+    <div class="row mb-4" data-aos="fade-down">
+        <div class="col-12">
+            <div class="card-modern">
+                <div class="card-body text-center py-5">
+                    <h1 class="display-4 fw-bold text-gradient mb-3">
+                        <i class="fas fa-graduation-cap"></i>
+                        Welcome to CO-PO Calculator
+                    </h1>
+                    <p class="lead text-muted">
+                        Empowering educators with modern assessment tools
+                    </p>
+                    {% if user.is_authenticated %}
+                        <p class="text-primary fw-bold">
+                            <i class="fas fa-user-circle me-2"></i>
+                            Welcome back, {{ user.username }}!
+                        </p>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- Quick Actions -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <h2 class="h3 mb-3 text-gradient">
+                <i class="fas fa-bolt me-2"></i>
+                Quick Actions
+            </h2>
+        </div>
+        
+        <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="500">
+            <div class="card-modern text-center">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="fas fa-plus-circle fa-3x text-primary"></i>
+                    </div>
+                    <h5 class="card-title">Add New Course</h5>
+                    <p class="card-text text-muted">Create a new course for assessment</p>
+                    <a href="{% url 'add_course' %}" class="btn btn-primary-modern">
+                        <i class="fas fa-plus me-1"></i>Add Course
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="600">
+            <div class="card-modern text-center">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="fas fa-upload fa-3x text-success"></i>
+                    </div>
+                    <h5 class="card-title">Upload Marks</h5>
+                    <p class="card-text text-muted">Upload student marks via Excel</p>
+                    <a href="{% url 'upload_marks' %}" class="btn btn-success-modern">
+                        <i class="fas fa-upload me-1"></i>Upload
+                    </a>
+                </div>
+            </div>
+        </div>
+        
+        <div class="col-md-4 mb-3" data-aos="fade-up" data-aos-delay="700">
+            <div class="card-modern text-center">
+                <div class="card-body">
+                    <div class="mb-3">
+                        <i class="fas fa-chart-line fa-3x text-warning"></i>
+                    </div>
+                    <h5 class="card-title">View Attainment</h5>
+                    <p class="card-text text-muted">Check CO and PO attainment</p>
+                    <a href="{% url 'co_attainment' %}" class="btn btn-warning-modern">
+                        <i class="fas fa-chart-line me-1"></i>View Results
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>    
+        <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="900">
+            <div class="card-modern">
+                <div class="card-header-modern">
+                    <h5 class="mb-0">
+                        <i class="fas fa-lightbulb me-2"></i>
+                        Tips & Tricks
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info-modern">
+                        <i class="fas fa-info-circle me-2"></i>
+                        <strong>Pro Tip:</strong> Use Excel templates for bulk uploads to save time.
+                    </div>
+                    
+                    <div class="alert alert-warning-modern">
+                        <i class="fas fa-exclamation-triangle me-2"></i>
+                        <strong>Reminder:</strong> Update CO-PO mappings before calculating attainments.
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 {% endblock %}
