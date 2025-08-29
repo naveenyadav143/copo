@@ -6,67 +6,84 @@
     <title>Register</title>
     <link rel="stylesheet" href="{% static 'styles.css' %}">
 <!-- Bootstrap CSS is already included in base.html -->
-    <style>
+  <style>
         body {
-            background: #f4f7fa;
+            background: #f4f6fb;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         .register-container {
-            background: #fff;
-            border-radius: 12px;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.06);
-            padding: 32px 28px 24px 28px;
-            max-width: 420px;
-            margin: 48px auto;
-        }
-        .register-container h2 {
-            color: #004c99;
-            font-weight: 600;
-            margin-bottom: 18px;
-        }
-        .register-container form label {
-            font-weight: 500;
-            color: #013a6b;
-        }
-        .register-container input,
-        .register-container select,
-        .register-container textarea {
-            border: 1.5px solid #b6d0ee;
-            border-radius: 6px;
-            padding: 8px 12px;
-            margin-bottom: 12px;
             width: 100%;
-            background: #f8fbff;
-            color: #013a6b;
-            transition: border 0.2s, box-shadow 0.2s;
+            max-width: 400px; /* increased from 360px */
+            margin: 0 auto;
+            border-radius: 12px;
+            box-shadow: 0 4px 14px rgba(0,0,0,0.08);
+            background: #fff;
+            padding: 28px 24px;
         }
-        .register-container input:focus,
-        .register-container select:focus,
-        .register-container textarea:focus {
-            border-color: #004c99;
-            box-shadow: 0 0 0 2px #b6d0ee44;
+        h2 {
+            text-align: center;
+            margin-bottom: 18px;
+            color: #2563eb;
+            font-size: 1.4rem;
+            font-weight: 600;
+        }
+        form p {
+            margin-bottom: 14px;
+        }
+        label {
+            display: block;
+            font-weight: 500;
+            color: #334155;
+            font-size: 0.95rem;
+            margin-bottom: 5px;
+        }
+        input, select, textarea {
+            width:350px;
+            padding: 10px 12px;
+            border: 1px solid #dbeafe;
+            border-radius: 6px;
+            font-size: 0.95rem;
+            background: #f9fafb;
+            color: #1e293b;
+            transition: 0.2s;
+        }
+        input:focus, select:focus, textarea:focus {
+            border-color: #2563eb;
+            background: #f1f5f9;
             outline: none;
-            background: #eaf4fb;
         }
-        .register-container .btn-primary {
-            background: linear-gradient(90deg, #004c99 60%, #0074d9 100%);
+        .btn-primary {
+            background: #2563eb;
             border: none;
             border-radius: 6px;
-            font-weight: 500;
-            padding: 8px 24px;
+            font-weight: 600;
+            font-size: 1rem;
+            padding: 10px 0;
             color: #fff;
-            box-shadow: 0 2px 8px rgba(0,76,153,0.07);
+            width: 100%;
+            margin-top: 8px;
+            cursor: pointer;
+            transition: 0.2s;
         }
-        .register-container .btn-primary:hover {
-            background: linear-gradient(90deg, #005f99 60%, #0099ff 100%);
+        .btn-primary:hover {
+            background: #1d4ed8;
         }
-        .register-container .login-link {
-            color: #004c99;
+        .login-link {
+            color: #2563eb;
             font-weight: 500;
-            transition: color 0.18s;
-        }
-        .register-container .login-link:hover {
             text-decoration: underline;
-            color: #0074d9;
+        }
+        .login-link:hover {
+            color: #1d4ed8;
+        }
+        p.mt-3 {
+            text-align: center;
+            margin-top: 16px;
+            font-size: 0.9rem;
+            color: #475569;
         }
     </style>
 </head>

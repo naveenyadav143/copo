@@ -4,7 +4,7 @@
 {% block content %}
 <link rel="stylesheet" href="{% static 'styles.css' %}">
 
-<div class="content">
+<div class="content" style="margin-top: 70px;">
     {% if messages %}
         {% for message in messages %}
             <div class="alert alert-info alert-dismissible fade show" role="alert">
@@ -32,22 +32,22 @@
                             {% csrf_token %}
                             
                             <div class="mb-4">
-                                <label for="po_number" class="form-label fw-semibold">
+                                <label for="po_number" class="form-label fw-semibold" style="color: gray;">
                                     <i class="fas fa-hashtag me-2 text-primary"></i>PO Number
                                 </label>
                                 <input type="text" id="po_number" name="po_number" class="form-control form-control-lg" 
                                        required placeholder="e.g., PO1, PO2, PO3" maxlength="10">
-                                <div class="form-text">Enter the PO identifier (e.g., PO1, PO2, etc.)</div>
+                                <div style="color: gray;" class="form-text">Enter the PO identifier (e.g., PO1, PO2, etc.)</div>
                             </div>
                             
                             <div class="mb-4">
-                                <label for="po_description" class="form-label fw-semibold">
+                                <label style="color: gray;" for="po_description" class="form-label fw-semibold">
                                     <i class="fas fa-align-left me-2 text-primary"></i>Description
                                 </label>
                                 <textarea id="po_description" name="po_description" class="form-control form-control-lg" 
                                           rows="4" required placeholder="Enter detailed description of the Program Outcome..."
                                           maxlength="500"></textarea>
-                                <div class="form-text">Maximum 500 characters</div>
+                                <div style="color: gray;" class="form-text">Maximum 500 characters</div>
                             </div>
                             
                             <div class="d-grid">

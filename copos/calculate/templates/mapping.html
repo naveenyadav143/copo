@@ -5,12 +5,17 @@
 <link rel="stylesheet" href="{% static 'styles.css' %}">
 
 <!-- Hero Section with Animation -->
-<section class="hero-section py-1 mb-1" data-aos="fade-down">
+<section class="hero-section py-1 mb-1" style="margin-top: 40px; background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%); border-radius: 0 0 50px 50px; box-shadow: 0 4px 24px rgba(67,206,162,0.10);" data-aos="fade-down">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
-                <h1 class="display-4 fw-bold text-primary mb-3" style="color: black;">
-                    <i class="bi bi-diagram-3 me-3" style="color: black;"></i>CO-PO Mapping
+                <h1 class="display-4 fw-bold mb-3"
+                    style="background: linear-gradient(90deg, #fff 10%, #43cea2 60%, #4e98e2 100%);
+                           -webkit-background-clip: text;
+                           -webkit-text-fill-color: transparent;
+                           background-clip: text;">
+                    <i class="bi bi-diagram-3 me-3"></i>
+                    CO-PO Mapping
                 </h1>
             </div>
         </div>
@@ -30,7 +35,7 @@
                 </div>
                 <div class="card-body p-4">
                     <div class="mb-3">
-                        <label for="course" class="form-label fw-semibold">
+                        <label for="course" style="color: gray;" class="form-label fw-semibold">
                             <i class="bi bi-book me-2 text-primary"></i>Choose Course
                         </label>
                         <select id="course" name="course" class="form-select form-select-lg border-primary" 
@@ -67,7 +72,7 @@
                         <input type="hidden" name="course" id="hidden_course" value="">
                         
                         <div class="mb-4">
-                            <label for="co" class="form-label fw-semibold">
+                            <label style="color: gray;"  for="co" class="form-label fw-semibold">
                                 <i class="bi bi-target me-2 text-primary"></i>Course Outcome (CO)
                             </label>
                             <select id="co" name="co" class="form-select form-select-lg border-primary" required disabled>
@@ -81,7 +86,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="po" class="form-label fw-semibold">
+                            <label style="color: gray;"  for="po" class="form-label fw-semibold">
                                 <i class="bi bi-bullseye me-2 text-success"></i>Program Outcome (PO)
                             </label>
                             <select id="po" name="po" class="form-select form-select-lg border-success" required disabled>
@@ -95,7 +100,7 @@
                         </div>
 
                         <div class="mb-4">
-                            <label for="level" class="form-label fw-semibold">
+                            <label style="color: gray;"  for="level" class="form-label fw-semibold">
                                 <i class="bi bi-speedometer2 me-2 text-warning"></i>Mapping Level
                             </label>
                             <select name="level" id="level" class="form-select form-select-lg border-warning" required disabled>
@@ -129,7 +134,7 @@
                         <input type="hidden" name="course" id="hidden_course_excel" value="">
                         
                         <div class="mb-4">
-                            <label for="excel_file" class="form-label fw-semibold">
+                            <label style="color: gray;"  for="excel_file" class="form-label fw-semibold">
                                 <i class="bi bi-file-earmark-excel me-2 text-success"></i>Upload Excel File
                             </label>
                             <div class="input-group">
@@ -140,7 +145,7 @@
                                     <i class="bi bi-question-circle"></i>
                                 </button>
                             </div>
-                            <small class="text-muted">
+                            <small style="color: gray;"  >
                                 <i class="bi bi-info-circle me-1"></i>
                                 Format: CO_ID, PO_ID, LEVEL (with headers in first row)
                             </small>
@@ -175,21 +180,21 @@
                         <div class="col-6">
                             <div class="stat-item">
                                 <h3 class="text-primary mb-1" id="totalCOs">0</h3>
-                                <small class="text-muted">Total COs</small>
+                                <small style="color: gray;"  >Total COs</small>
                             </div>
                         </div>
                         <div class="col-6">
                             <div class="stat-item">
                                 <h3 class="text-success mb-1" id="totalPOs">0</h3>
-                                <small class="text-muted">Total POs</small>
+                                <small style="color: gray;"  >Total POs</small>
                             </div>
                         </div>
                     </div>
                     <div class="progress mt-3" style="height: 8px;">
                         <div class="progress-bar bg-primary" role="progressbar" style="width: 0%" id="mappingProgress"></div>
                     </div>
-                    <small class="text-muted mt-2 d-block text-center">
-                        <span id="mappingCount">0</span> mappings created
+                    <small style="color: gray;"  class=" mt-2 d-block text-center">
+                        <span  id="mappingCount">0</span> mappings created
                     </small>
                 </div>
             </div>
@@ -207,7 +212,7 @@
 
 <style>
     .hero-section {
-        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        background: linear-gradient(135deg, #43cea2 0%, #185a9d 100%);
         color: rgb(6, 5, 5);
         border-radius: 0 0 50px 50px;
     }

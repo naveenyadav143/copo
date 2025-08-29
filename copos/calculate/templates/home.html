@@ -10,11 +10,11 @@
         <div class="col-12">
             <div class="card-modern">
                 <div class="card-body text-center py-5">
-                    <h1 class="display-4 fw-bold text-gradient mb-3">
-                        <i class="fas fa-graduation-cap"></i>
-                        Welcome to CO-PO Calculator
-                    </h1>
-                    <p class="lead text-muted">
+                   <h1 class="display-4 fw-bold mb-3" style="background: linear-gradient(90deg, #2563eb 10%, #38bdf8 60%, #a21caf 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;">
+    <i class="fas fa-graduation-cap"></i>
+    Welcome to CO-PO Calculator
+</h1>
+                    <p  class="text-lg">
                         Empowering educators with modern assessment tools
                     </p>
                     {% if user.is_authenticated %}
@@ -31,8 +31,8 @@
 
     <!-- Quick Actions -->
     <div class="row mb-4">
-        <div class="col-12">
-            <h2 class="h3 mb-3 text-gradient">
+        <div class="col-12" style="padding: 10px; display: flex; justify-content: center; align-items: center;">
+            <h2 class="h3 mb-3 text-gradient " style="font-size:30px;">
                 <i class="fas fa-bolt me-2"></i>
                 Quick Actions
             </h2>
@@ -44,9 +44,9 @@
                     <div class="mb-3">
                         <i class="fas fa-plus-circle fa-3x text-primary"></i>
                     </div>
-                    <h5 class="card-title">Add New Course</h5>
-                    <p class="card-text text-muted">Create a new course for assessment</p>
-                    <a href="{% url 'add_course' %}" class="btn btn-primary-modern">
+                    <h5 class="card-title" style="">Add New Course</h5>
+                    <p style="color: rgb(137, 137, 137);">Create a new course for assessment</p>
+                    <a href="{% url 'add_course' %}" class="" style="color: rgb(23, 75, 188);">
                         <i class="fas fa-plus me-1"></i>Add Course
                     </a>
                 </div>
@@ -60,8 +60,8 @@
                         <i class="fas fa-upload fa-3x text-success"></i>
                     </div>
                     <h5 class="card-title">Upload Marks</h5>
-                    <p class="card-text text-muted">Upload student marks via Excel</p>
-                    <a href="{% url 'upload_marks' %}" class="btn btn-success-modern">
+                    <p style="color: rgb(137, 137, 137);">Upload student marks via Excel</p>
+                    <a href="{% url 'upload_marks' %}" class=""  style="color: rgb(23, 75, 188);">
                         <i class="fas fa-upload me-1"></i>Upload
                     </a>
                 </div>
@@ -75,17 +75,17 @@
                         <i class="fas fa-chart-line fa-3x text-warning"></i>
                     </div>
                     <h5 class="card-title">View Attainment</h5>
-                    <p class="card-text text-muted">Check CO and PO attainment</p>
-                    <a href="{% url 'co_attainment' %}" class="btn btn-warning-modern">
+                    <p style="color: rgb(137, 137, 137);">Check CO and PO attainment</p>
+                    <a href="{% url 'co_attainment' %}"  style="color: rgb(23, 75, 188);">
                         <i class="fas fa-chart-line me-1"></i>View Results
                     </a>
                 </div>
             </div>
         </div>
     </div>    
-        <div class="col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="900">
-            <div class="card-modern">
-                <div class="card-header-modern">
+        <div class="col-lg-4 mb-4"  data-aos="fade-up" data-aos-delay="900">
+            <div class="card-modern" >
+                <div class="card-header-modern" >
                     <h5 class="mb-0">
                         <i class="fas fa-lightbulb me-2"></i>
                         Tips & Tricks

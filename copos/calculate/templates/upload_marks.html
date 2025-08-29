@@ -8,7 +8,7 @@
 <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
 
 <!-- Hero Section -->
-<section class="hero-section py-3 mb-3" data-aos="fade-down">
+<section style="margin-top: 45px;" class="hero-section py-3 mb-3" data-aos="fade-down">
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-lg-8 text-center">
@@ -48,7 +48,7 @@
                         {% csrf_token %}
                         
                         <div class="mb-4" data-aos="fade-right" data-aos-delay="300">
-                            <label class="form-label fw-semibold">
+                            <label style="color: gray;"  class="form-label fw-semibold">
                                 <i class="bi bi-book me-2 text-primary"></i>Select Course
                             </label>
                             <select name="course_id" class="form-select form-select-lg border-primary" required>
@@ -60,14 +60,14 @@
                                     </option>
                                 {% endfor %}
                             </select>
-                            <div class="form-text">
+                            <div style="color: gray;"  class="form-text">
                                 <i class="bi bi-info-circle me-1"></i>
                                 Select the course for which you want to upload marks
                             </div>
                         </div>
 
                         <div class="mb-5" data-aos="fade-left" data-aos-delay="400">
-                            <label class="form-label fw-semibold">
+                            <label style="color: gray;"  class="form-label fw-semibold">
                                 <i class="bi bi-file-earmark-excel me-2 text-success"></i>Upload Excel File
                             </label>
                             <div class="input-group input-group-lg">
@@ -77,7 +77,7 @@
                                     <i class="bi bi-info-circle"></i>
                                 </button>
                             </div>
-                            <div class="form-text">
+                            <div style="color: gray;"  class="form-text">
                                 <i class="bi bi-check-circle me-1"></i>
                                 Accepted format: .xlsx only
                             </div>
@@ -110,14 +110,14 @@
                         <h6 class="mb-0">Quick Tips</h6>
                     </div>
                 </div>
-                <div class="card-body">
+                <div class="card-body" style="color: gray;" >
                     <div class="row">
                         <div class="col-md-6">
                             <div class="d-flex align-items-start mb-3">
                                 <i class="bi bi-1-circle-fill text-primary me-3 mt-1"></i>
                                 <div>
-                                    <strong>Prepare Your Excel</strong>
-                                    <p class="text-muted mb-0 small">Ensure your Excel file has proper headers and data format</p>
+                                    <strong style="color: black;">Prepare Your Excel</strong>
+                                    <p class=" mb-0 small">Ensure your Excel file has proper headers and data format</p>
                                 </div>
                             </div>
                         </div>
@@ -125,8 +125,8 @@
                             <div class="d-flex align-items-start mb-3">
                                 <i class="bi bi-2-circle-fill text-success me-3 mt-1"></i>
                                 <div>
-                                    <strong>Select Course</strong>
-                                    <p class="text-muted mb-0 small">Choose the correct course before uploading</p>
+                                    <strong style="color: black;">Select Course</strong>
+                                    <p class=" mb-0 small">Choose the correct course before uploading</p>
                                 </div>
                             </div>
                         </div>
