@@ -28,6 +28,7 @@ DEBUG = os.environ.get('DJANGO_DEBUG', '') != 'False'
 
 ALLOWED_HOSTS = ['.onrender.com', 'render.com', 'localhost', '127.0.0.1']
 
+LOGIN_URL = 'login'
 
 # Application definition
 

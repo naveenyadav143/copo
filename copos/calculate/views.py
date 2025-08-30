@@ -33,27 +33,27 @@ def register(request):
 
 
 def login_view(request):
+    next_url = request.GET.get('next') or request.POST.get('next') or '/'
     if request.method == 'POST':
         username = request.POST.get('username')
         password = request.POST.get('password')
         user = authenticate(request, username=username, password=password)
         if user is not None:
             login(request, user)
-            return render(request, 'home.html', {
-                'message': 'Login successful!',
-                'user': user
-            })
+            return redirect(next_url)
         else:
             return render(request, 'login.html', {
-                'error': 'Invalid credentials'
+                'error': 'Invalid credentials',
+                'next': next_url
             })
-    return render(request, 'login.html')
+    return render(request, 'login.html', {'next': next_url})
 
 
 def logout_view(request):
     logout(request)
     return redirect('login') 
 
+@login_required
 def add_course(request):
     if request.method == 'POST':
         course_code = request.POST.get('course_code')
@@ -62,6 +62,20 @@ def add_course(request):
 
         try:
             user = User.objects.get(id=user_id)
+            # Check for duplicate code or name for this user
+            if Course.objects.filter(user=user, code=course_code).exists():
+                return render(request, 'add_course.html', {
+                    'error': 'Course code already exists for this user.',
+                    'users': User.objects.all(),
+                    'user': request.user
+                })
+            if Course.objects.filter(user=user, name=course_name).exists():
+                return render(request, 'add_course.html', {
+                    'error': 'Course name already exists for this user.',
+                    'users': User.objects.all(),
+                    'user': request.user
+                })
+
             Course.objects.create(
                 code=course_code,
                 name=course_name,
@@ -70,7 +84,9 @@ def add_course(request):
             return redirect('add_course')  # or show success page
         except User.DoesNotExist:
             return render(request, 'add_course.html', {
-                'error': 'Invalid user selected.'
+                'error': 'Invalid user selected.',
+                'users': User.objects.all(),
+                'user': request.user
             })
 
     users = User.objects.all()
@@ -82,8 +98,13 @@ def add_course(request):
 
 def courses(request):
     if request.user.is_authenticated:
-        courses = Course.objects.filter(user=request.user)
-        return render(request, 'courses.html', {'courses': courses})
+        courses = Course.objects.filter(user=request.user).prefetch_related('co_set')
+        pos = PO.objects.all()
+            
+        return render(request, 'courses.html', {
+            'courses': courses, 
+            'pos': pos
+        })
     else:
         return redirect('login')  # Redirect to login if not authenticated
     
@@ -116,6 +137,7 @@ def add_co(request):
     courses = Course.objects.filter(user=request.user)
     return render(request, 'add_co.html', {'courses': courses})
 
+@login_required
 def add_po(request):
     if request.method == 'POST':
         po_number = request.POST.get('po_number')
@@ -207,15 +229,16 @@ def add_mapping(request):
     return render(request, 'mapping.html', {'cos': cos, 'pos': pos, 'courses': courses})
 
 
+@login_required
 def upload_marks(request):
-    courses = Course.objects.all()
+    courses = Course.objects.filter(user=request.user)
 
     if request.method == 'POST':
         excel_file = request.FILES.get('excel_file')
         course_id = request.POST.get('course_id')
 
         try:
-            course = Course.objects.get(id=course_id)
+            course = Course.objects.get(id=course_id, user=request.user)
             cos = {co.number.strip().upper(): co for co in CO.objects.filter(course=course)}
         except Course.DoesNotExist:
             messages.error(request, "Invalid course selected.")
@@ -430,65 +453,75 @@ def co_attainment_view(request):
         'average_level': overall_level_avg
     })
 
+@login_required
 def calculate_po_attainment(request):
     selected_course_id = request.GET.get('course_id')
     courses = Course.objects.filter(user=request.user)
-    po_scores = {}
+    attainment_data = []
     selected_course = None
+    average_level = 0
 
     if selected_course_id:
         selected_course = get_object_or_404(Course, id=selected_course_id, user=request.user)
         pos = PO.objects.all()
-        
-        # Get CO attainments for this course
+
+        # Get CO attainments
         co_attainments = {att.co.id: att.level_avg for att in COAttainment.objects.filter(course=selected_course)}
-        
-        # Get all CO-PO mappings for this course's COs
+
+        # Get mappings
         course_cos = CO.objects.filter(course=selected_course)
         mappings = COPOMapping.objects.filter(co__in=course_cos).select_related("co", "po")
 
-        # Group mappings by PO for efficient processing
         po_mappings = defaultdict(list)
         for mapping in mappings:
             po_mappings[mapping.po_id].append(mapping)
 
+        total_levels = 0
+        po_count = 0
+
         for po in pos:
             total_weighted_score = 0
             total_weight = 0
-
-            # Get mappings for this PO
             mappings_for_po = po_mappings.get(po.id, [])
-            
+
             for mapping in mappings_for_po:
                 co_id = mapping.co_id
-                attainment = co_attainments.get(co_id, 0)  # Default to 0 if missing
-                
-                if attainment > 0:  # Only include if there's attainment data
-                    # Weighted score: attainment level * mapping level
+                attainment = co_attainments.get(co_id, 0)
+
+                if attainment > 0:
                     weighted_score = attainment * mapping.level
                     total_weighted_score += weighted_score
-                    total_weight += mapping.level  # Use mapping level as weight
+                    total_weight += mapping.level
 
-            # Calculate PO attainment score (weighted average)
             if total_weight > 0:
-                # Normalize to percentage (0-100) scale
-                # Max possible: 3 (attainment) * 3 (mapping) = 9
-                # So we divide by 9 and multiply by 100 to get percentage
-                po_score = round((total_weighted_score / total_weight) * (100 / 3), 2)
+                level = round(total_weighted_score / total_weight, 2)  # keep it in 0–3 scale
             else:
-                po_score = 0
-                
-            po_scores[po.number] = po_score
-            
-            # Store PO attainment in database
+                level = 0
+
+            # Collect data for template
+            attainment_data.append({
+                "po_number": po.number,
+                "po_description": po.description,
+                "level": level,
+            })
+
+            # For average
+            total_levels += level
+            po_count += 1
+
+            # Save in DB
             POAttainment.objects.update_or_create(
                 course=selected_course,
                 po=po,
-                defaults={'attainment_score': po_score}
+                defaults={"attainment_score": level}
             )
 
-    return render(request, 'po_attainment.html', {
-        'courses': courses,
-        'selected_course': selected_course,
-        'po_scores': po_scores
+        # Compute average across all POs
+        average_level = round(total_levels / po_count, 2) if po_count > 0 else 0
+
+    return render(request, "po_attainment.html", {
+        "courses": courses,
+        "selected_course": selected_course,
+        "attainment_data": attainment_data,
+        "average_level": average_level,
     })

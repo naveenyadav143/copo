@@ -153,6 +153,11 @@
             <i class="fas fa-chart-bar me-2"></i> PO Attainment
           </a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link {% if request.resolver_match.url_name == 'po_attainment' %}active{% endif %}" href="{% url 'po_attainment' %}">
+            <i class="fas fa-chart-bar me-2"></i> PO Attainment
+          </a>
+        </li>
       </ul>
     </div>
   </nav>
