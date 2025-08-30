@@ -1,1 +1,1 @@
-web: gunicorn copos.wsgi:application
+web: gunicorn copos.copos.wsgi:application
