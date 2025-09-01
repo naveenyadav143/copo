@@ -18,3 +18,4 @@ services:
 databases:
   - name: copo-db
     plan: free
+buildCommand: "pip install -r requirements.txt && python manage.py collectstatic --noinput && python manage.py migrate"
