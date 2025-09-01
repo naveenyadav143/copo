@@ -72,23 +72,16 @@ WSGI_APPLICATION = 'copos.wsgi.application'
 # ------------------------------------------------------------------------------
 # Database
 # ------------------------------------------------------------------------------
-if os.environ.get("RENDER"):
-    # On Render → use Postgres
-    DATABASES = {
-        "default": dj_database_url.config(
-            default=os.environ.get("DATABASE_URL"),
-            conn_max_age=600,
-            ssl_require=True
-        )
-    }
-else:
-    # Local development → use SQLite
-    DATABASES = {
-        "default": {
-            "ENGINE": "django.db.backends.sqlite3",
-            "NAME": BASE_DIR / "db.sqlite3",
-        }
-    }
+import dj_database_url
+import os
+
+# Default to SQLite for local development
+DATABASES = {
+    "default": dj_database_url.config(
+        default=f"sqlite:///{os.path.join(BASE_DIR, 'db.sqlite3')}",
+        conn_max_age=600,
+    )
+}
 
 # ------------------------------------------------------------------------------
 # Password validation
