@@ -14,4 +14,5 @@ urlpatterns = [
     path('upload-marks/', views.upload_marks, name='upload_marks'),
     path('co-attainment/', views.co_attainment_view, name='co_attainment'),
     path('po-attainment/', views.calculate_po_attainment, name='po_attainment'),
+    path("guide/", views.guide, name="guide"),
 ]

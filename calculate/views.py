@@ -10,6 +10,11 @@ from collections import defaultdict
 from django.http import HttpResponse, Http404
 from statistics import mode, StatisticsError
 
+
+def guide(request):
+    return render(request, "guide.html")
+
+
 # Create your views here.
 def home(request):
     return render(request, 'home.html')

@@ -85,6 +85,63 @@ body {
     background: linear-gradient(135deg, #16a085, #1abc9c);
 }
 
+/* Button Color Combinations */
+.btn-primary {
+    background: linear-gradient(135deg, #007bff, #0056b3);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+    background: linear-gradient(135deg, #0056b3, #007bff);
+}
+
+.btn-secondary {
+    background: linear-gradient(135deg, #6c757d, #495057);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.btn-secondary:hover {
+    background: linear-gradient(135deg, #495057, #6c757d);
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #28a745, #1e7e34);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #1e7e34, #28a745);
+}
+
+.btn-danger {
+    background: linear-gradient(135deg, #dc3545, #bd2130);
+    color: #fff;
+    font-weight: 600;
+    border: none;
+    padding: 10px 18px;
+    border-radius: 10px;
+    transition: background 0.3s ease;
+}
+
+.btn-danger:hover {
+    background: linear-gradient(135deg, #bd2130, #dc3545);
+}
+
 /* Tables */
 .table {
     border-radius: 12px;
@@ -129,4 +186,36 @@ body {
 .dark-mode .card {
     background: #2f3640;
     color: #f5f6fa;
+}
+
+/* Custom styles for Guide, Login, Logout buttons and username in navbar */
+.navbar-nav .nav-link.btn-secondary {
+    padding: 8px 16px;
+    font-weight: 600;
+    margin-right: 10px;
+}
+
+.navbar-nav .nav-link.btn-success {
+    padding: 8px 16px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.navbar-nav .nav-link.btn-danger {
+    padding: 8px 16px;
+    font-weight: 600;
+    margin-left: 10px;
+}
+
+.navbar-text {
+    color: #fff;
+    font-weight: 600;
+    margin: 0 10px;
+    display: flex;
+    align-items: center;
+}
+
+.navbar-text i {
+    margin-right: 6px;
+    font-size: 1.2rem;
 }

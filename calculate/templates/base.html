@@ -19,25 +19,18 @@
 
   <style>
     [data-bs-theme="light"] .sidebar {
-  background: #fff !important;
-  color: #222 !important;
-}
-[data-bs-theme="light"] .sidebar .nav-link,
-[data-bs-theme="light"] .sidebar h4 {
-  color: #222 !important;
-}
-[data-bs-theme="light"] .sidebar .nav-link.active {
-  color: #0d6efd !important;
-  font-weight: 600;
-}
-    /* Sidebar toggle button (floating) */
-    .sidebar-toggle{
-      position: fixed; left: 1rem; bottom: 1rem;
-      width: 48px; height: 48px; border-radius: 50%;
-      border: none; box-shadow: 0 4px 12px rgba(0,0,0,.2);
-      z-index: 1055; background: var(--bs-primary); color: #fff;
-      display: inline-flex; align-items: center; justify-content: center;
+      background: #fff !important;
+      color: #222 !important;
     }
+    [data-bs-theme="light"] .sidebar .nav-link,
+    [data-bs-theme="light"] .sidebar h4 {
+      color: #222 !important;
+    }
+    [data-bs-theme="light"] .sidebar .nav-link.active {
+      color: #0d6efd !important;
+      font-weight: 600;
+    }
+
     .sidebar-overlay{
       position: fixed; inset: 0; background: rgba(0,0,0,.35);
       z-index: 1050; display: none;
@@ -57,7 +50,26 @@
     @media (min-width: 992px){
       .sidebar{ left: 0; }
       .main-content{ margin-left: 280px; }
-      .sidebar-overlay, .sidebar-toggle{ display: none; }
+      .sidebar-overlay { display: none; }
+    }
+
+    /* Navbar button styles */
+    .navbar-nav .nav-link {
+      transition: all 0.3s ease;
+      border-radius: 8px;
+      padding: 0.5rem 1rem;
+      margin: 0 0.25rem;
+      border: 1px solid transparent;
+    }
+    .navbar-nav .nav-link:hover {
+      background-color: rgba(255, 255, 255, 0.15);
+      border-color: rgba(255, 255, 255, 0.3);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    }
+    .navbar-nav .nav-link:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
     }
   </style>
 </head>
@@ -66,30 +78,28 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
     <div class="container-fluid">
-      <!-- NEW: Sidebar toggle button inside navbar -->
-      <button class="btn btn-outline-light me-2" id="sidebarNavToggle" aria-label="Toggle sidebar">
+      <!-- ✅ Sidebar toggle button in navbar -->
+      <button class="btn btn-primary me-2" id="sidebarToggle" aria-label="Toggle sidebar">
         <i class="bi bi-list"></i>
       </button>
 
       <a class="navbar-brand" href="/">COPO System</a>
-
-      <!-- THEME TOGGLE -->
-      <button class="btn btn-outline-light ms-auto me-2" id="themeToggle" aria-label="Toggle theme" type="button">
-        <i class="fas fa-moon"></i>
-      </button>
-
+      
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-lg-center">
           {% if user.is_authenticated %}
+          <li class="nav-item">
+            <a class="nav-link btn btn-secondary" href="/guide/">Guide  </a>
+          </li>
           <li class="nav-item me-lg-2">
             <span class="navbar-text"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="/logout/">Logout</a>
+            <a class="nav-link btn btn-danger" href="/logout/">Logout</a>
           </li>
           {% else %}
           <li class="nav-item">
-            <a class="nav-link" href="/login/">Login</a>
+            <a class="nav-link btn btn-success" href="/login/">Login</a>
           </li>
           {% endif %}
         </ul>
@@ -97,16 +107,13 @@
     </div>
   </nav>
 
-  <!-- Sidebar Overlay + Floating Toggle -->
+  <!-- Sidebar Overlay -->
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
-  <button class="sidebar-toggle" id="sidebarToggle" aria-label="Toggle sidebar" aria-expanded="false">
-    <i class="bi bi-list"></i>
-  </button>
 
   <!-- Sidebar -->
   <nav class="sidebar" id="sidebar" style="margin-top: 10px;">
     <div class="px-3 pb-2">
-      <h4 class="mt-2 mb-4" style="color: white;">COPO System</h4>
+      <h4 class="mt-2 mb-4">COPO System</h4>
       <ul class="nav flex-column">
         <li class="nav-item">
           <a class="nav-link {% if request.resolver_match.url_name == 'home' %}active{% endif %}" href="{% url 'home' %}">
@@ -153,11 +160,6 @@
             <i class="fas fa-chart-bar me-2"></i> PO Attainment
           </a>
         </li>
-        <li class="nav-item">
-          <a class="nav-link {% if request.resolver_match.url_name == 'po_attainment' %}active{% endif %}" href="{% url 'po_attainment' %}">
-            <i class="fas fa-chart-bar me-2"></i> PO Attainment
-          </a>
-        </li>
       </ul>
     </div>
   </nav>
@@ -183,7 +185,6 @@
     const sidebar = document.getElementById("sidebar");
     const sidebarOverlay = document.getElementById("sidebarOverlay");
     const sidebarToggle = document.getElementById("sidebarToggle");
-    const sidebarNavToggle = document.getElementById("sidebarNavToggle");
 
     function toggleSidebar(){
       sidebar.classList.toggle("show");
@@ -191,49 +192,20 @@
     }
 
     sidebarToggle.addEventListener("click", toggleSidebar);
-    sidebarNavToggle.addEventListener("click", toggleSidebar);
     sidebarOverlay.addEventListener("click", toggleSidebar);
 
-    // === THEME TOGGLE (Bootstrap color modes) ===
-    (function(){
-      const btn = document.getElementById('themeToggle');
-      const root = document.documentElement;
-
-      function applyTheme(mode){
-        root.setAttribute('data-bs-theme', mode);
-        if (mode === 'dark'){
-          btn.innerHTML = '<i class="fas fa-sun"></i>';
-          btn.setAttribute('title','Switch to light mode');
-        } else {
-          btn.innerHTML = '<i class="fas fa-moon"></i>';
-          btn.setAttribute('title','Switch to dark mode');
-        }
-      }
-
-      const saved = localStorage.getItem('themeMode');
-      const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
-      const initial = saved || (systemPrefersDark ? 'dark' : 'light');
-      applyTheme(initial);
-
-      btn?.addEventListener('click', () => {
-        const current = root.getAttribute('data-bs-theme') === 'dark' ? 'dark' : 'light';
-        const next = current === 'dark' ? 'light' : 'dark';
-        applyTheme(next);
-        localStorage.setItem('themeMode', next);
-      });
-    })();
-
+    // Close sidebar if clicking outside
     document.addEventListener('click', function(e) {
-  if (
-    sidebar.classList.contains('show') &&
-    !sidebar.contains(e.target) &&
-    !sidebarToggle.contains(e.target) &&
-    !sidebarNavToggle.contains(e.target)
-  ) {
-    toggleSidebar();
-  }
-});
-
+      if (
+        sidebar.classList.contains('show') &&
+        !sidebar.contains(e.target) &&
+        !sidebarToggle.contains(e.target)
+      ) {
+        toggleSidebar();
+      }
+    });
   </script>
+  
+  
 </body>
 </html>
