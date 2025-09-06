@@ -15,7 +15,6 @@
 
   <!-- Your CSS -->
   <link rel="stylesheet" href="{% static 'styles.css' %}"/>
-  <script src="{% static 'sidebar.js' %}" defer></script>
 
   <style>
     [data-bs-theme="light"] .sidebar {
@@ -31,25 +30,38 @@
       font-weight: 600;
     }
 
-    .sidebar-overlay{
-      position: fixed; inset: 0; background: rgba(0,0,0,.35);
-      z-index: 1050; display: none;
+    .sidebar-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,.35);
+      z-index: 1050;
+      display: none;
     }
-    .sidebar-overlay.show{ display:block; }
+    .sidebar-overlay.show { display:block; }
 
     /* Sidebar */
-    .sidebar{
-      position: fixed; top: 56px; left: -280px; bottom: 0;
-      width: 280px; background: var(--bs-body-bg); border-right: 1px solid var(--bs-border-color);
-      overflow-y: auto; transition: left .25s ease; z-index: 1060; padding-top: .75rem;
+    .sidebar {
+      position: fixed;
+      top: 56px;
+      left: -280px;
+      bottom: 0;
+      width: 280px;
+      background: var(--bs-body-bg);
+      border-right: 1px solid var(--bs-border-color);
+      overflow-y: auto;
+      transition: left .25s ease;
+      z-index: 1060;
+      padding-top: .75rem;
     }
-    .sidebar.show{ left: 0; }
-    .main-content{ padding-top: 72px; padding-left: 0; }
-    .nav-link.active{ font-weight: 600; color: var(--bs-primary) !important; }
+    .sidebar.show { left: 0; }
 
-    @media (min-width: 992px){
-      .sidebar{ left: 0; }
-      .main-content{ margin-left: 280px; }
+    .main-content { padding-top: 72px; padding-left: 0; }
+
+    .nav-link.active { font-weight: 600; color: var(--bs-primary) !important; }
+
+    @media (min-width: 992px) {
+      .sidebar { left: 0; }
+      .main-content { margin-left: 280px; }
       .sidebar-overlay { display: none; }
     }
 
@@ -78,18 +90,18 @@
   <!-- Navbar -->
   <nav class="navbar navbar-expand-lg navbar-dark bg-primary fixed-top">
     <div class="container-fluid">
-      <!-- ✅ Sidebar toggle button in navbar -->
-      <button class="btn btn-primary me-2" id="sidebarToggle" aria-label="Toggle sidebar">
+      <!-- Sidebar toggle button -->
+      <button class="btn btn-primary me-2" id="sidebarToggle" aria-label="Toggle sidebar" aria-expanded="false">
         <i class="bi bi-list"></i>
       </button>
 
       <a class="navbar-brand" href="/">COPO System</a>
-      
+
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto align-items-lg-center">
           {% if user.is_authenticated %}
           <li class="nav-item">
-            <a class="nav-link btn btn-secondary" href="/guide/">Guide  </a>
+            <a class="nav-link btn btn-secondary" href="/guide/">Guide</a>
           </li>
           <li class="nav-item me-lg-2">
             <span class="navbar-text"><i class="bi bi-person-circle me-1"></i>{{ user.username }}</span>
@@ -111,7 +123,7 @@
   <div class="sidebar-overlay" id="sidebarOverlay"></div>
 
   <!-- Sidebar -->
-  <nav class="sidebar" id="sidebar" style="margin-top: 10px;">
+  <nav class="sidebar" id="sidebar">
     <div class="px-3 pb-2">
       <h4 class="mt-2 mb-4">COPO System</h4>
       <ul class="nav flex-column">
@@ -186,15 +198,16 @@
     const sidebarOverlay = document.getElementById("sidebarOverlay");
     const sidebarToggle = document.getElementById("sidebarToggle");
 
-    function toggleSidebar(){
-      sidebar.classList.toggle("show");
+    function toggleSidebar() {
+      const isShown = sidebar.classList.toggle("show");
       sidebarOverlay.classList.toggle("show");
+      sidebarToggle.setAttribute("aria-expanded", isShown);
     }
 
     sidebarToggle.addEventListener("click", toggleSidebar);
     sidebarOverlay.addEventListener("click", toggleSidebar);
 
-    // Close sidebar if clicking outside
+    // Close sidebar when clicking outside (on mobile)
     document.addEventListener('click', function(e) {
       if (
         sidebar.classList.contains('show') &&
@@ -205,7 +218,6 @@
       }
     });
   </script>
-  
-  
+
 </body>
 </html>

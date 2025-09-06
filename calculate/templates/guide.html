@@ -1,20 +1,123 @@
 {% load static %}
-<div>
-  <h6>Getting Started:</h6>
-  <ol>
-    <li><b>Login/Register</b> with your credentials.</li>
-    <li><b>Add Courses</b> with their objectives and outcomes.</li>
-    <li><b>Map COs to POs</b> using the mapping tool.</li>
-    <li><b>Upload Marks</b> for assessments.</li>
-    <li><b>View Reports</b> to check CO/PO attainment instantly.</li>
-  </ol>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>User Guide - COPO System</title>
 
-  <hr>
-  <h6>📂 Download Resources:</h6>
-  <ul>
-    <li><a href="{% static 'files/copodata.xlsx' %}" download>Download COPO Data (Excel)</a></li>
-    <li><a href="{% static 'files/copo_mapping.xlsx' %}" download>Download COPO Mapping (Excel)</a></li>
-  </ul>
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
 
-  <p class="text-muted">Tip: You can find this guide anytime using the Help button in the top menu.</p>
+  <!-- Font Awesome -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    body {
+      font-family: 'Inter', sans-serif;
+      background: #f9f9f9;
+    }
+
+    .card {
+      border-radius: 1rem;
+    }
+
+    .card-header {
+      font-size: 1.2rem;
+      font-weight: 600;
+      border-top-left-radius: 1rem;
+      border-top-right-radius: 1rem;
+    }
+
+    .animated-icon {
+      transition: transform 0.3s ease-in-out;
+    }
+    .animated-icon:hover {
+      transform: scale(1.2) rotate(10deg);
+    }
+
+    .list-group-item {
+      border: none;
+      background: #fdfdfd;
+    }
+
+    .btn {
+      border-radius: 0.75rem;
+      transition: all 0.3s ease;
+    }
+    .btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    .alert {
+      border-radius: 0.75rem;
+    }
+  </style>
+</head>
+<body>
+  <div class="container-fluid py-5">
+    <div class="row justify-content-center">
+      <div class="col-lg-8 col-md-10">
+        <div class="card shadow-sm">
+          <div class="card-header bg-primary text-white">
+            <div class="text-center mt-3">
+  <button class="btn btn-secondary" onclick="goBack()">
+    <i class="fas fa-arrow-left me-2"></i>Back
+  </button>
 </div>
+
+<script>
+function goBack() {
+  if (window.history.length > 1) {
+    window.history.back(); // go to previous page
+  } else {
+    window.location.href = "/"; // fallback: redirect to homepage
+  }
+}
+</script>
+
+            <h5 class="card-title mb-0">
+              <i class="fas fa-info-circle me-2 animated-icon"></i>User Guide
+            </h5>
+          </div>
+          <div class="card-body">
+            <h6 class="text-primary mb-3">
+              <i class="fas fa-play-circle me-2 animated-icon"></i>Getting Started:
+            </h6>
+            <ol class="list-group list-group-numbered mb-4">
+              <li class="list-group-item"><strong>Login/Register</strong> with your credentials.</li>
+              <li class="list-group-item"><strong>Add Courses</strong> with their objectives and outcomes.</li>
+              <li class="list-group-item"><strong>Map COs to POs</strong> using the mapping tool.</li>
+              <li class="list-group-item"><strong>Upload Marks</strong> for assessments.</li>
+              <li class="list-group-item"><strong>View Reports</strong> to check CO/PO attainment instantly.</li>
+            </ol>
+
+            <hr class="my-4">
+
+            <h6 class="text-success mb-3">
+              <i class="fas fa-download me-2 animated-icon"></i>📂 Download Resources:
+            </h6>
+            <div class="d-grid gap-2 mb-4">
+              <a href="{% static 'copodata.xlsx' %}" download class="btn btn-outline-primary">
+                <i class="fas fa-file-excel me-2 animated-icon"></i>Download COPO Data (Excel)
+              </a>
+              <a href="{% static 'copo mapping.xlsx' %}" download class="btn btn-outline-success">
+                <i class="fas fa-file-excel me-2"></i>Download COPO Mapping (Excel)
+              </a>
+            </div>
+
+            <div class="alert alert-info" role="alert">
+              <i class="fas fa-lightbulb me-2"></i><strong>Tip:</strong> You can find this guide anytime using the Help button in the top menu.
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
