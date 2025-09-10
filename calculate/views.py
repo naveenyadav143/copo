@@ -148,10 +148,15 @@ def add_po(request):
         po_number = request.POST.get('po_number')
         po_description = request.POST.get('po_description')
 
-        PO.objects.create(
-            number=po_number,
-            description=po_description
-        )
+        # Check for duplicate PO number
+        if PO.objects.filter(number=po_number).exists():
+            messages.warning(request, "PO with this number already exists.")
+        else:
+            PO.objects.create(
+                number=po_number,
+                description=po_description
+            )
+            messages.success(request, "PO added successfully!")
         return redirect('add_po')  # or show success page
 
     return render(request, 'add_po.html')
