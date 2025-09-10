@@ -1,10 +1,9 @@
 #!/usr/bin/env bash
-# Exit on error
-set -o errexit
+set -e
 
-# Install dependencies
+pip install --upgrade pip
 pip install -r requirements.txt
 
-# Collect static files
 python manage.py collectstatic --noinput
 python manage.py migrate --noinput
+python manage.py createsu
