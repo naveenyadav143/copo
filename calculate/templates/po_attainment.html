@@ -1,554 +1,188 @@
 {% extends 'base.html' %}
 {% load static %}
 {% block title %}PO Attainment{% endblock %}
+
 {% block content %}
-
 <div class="container mt-5">
-    <div class="container-fluid py-4">
-        <!-- Page Header with Enhanced Animation -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="d-flex justify-content-between align-items-center">
-                    <div>
-                        <h1 class="h2 text-gradient mb-1" data-aos="fade-right" data-aos-duration="1000">
-                            <i class="fas fa-graduation-cap me-2"></i>PO Attainment
-                        </h1>
-                        <p class=" mb-0" style="color: gray;" data-aos="fade-right" data-aos-delay="200" data-aos-duration="1000">
-                            Analyze and track Program Outcome attainment levels
-                        </p>
-                    </div>
-                    <div class="d-none d-md-block" data-aos="fade-left" data-aos-delay="400" data-aos-duration="1000">
-                        <div class="icon-float">
-                            <i class="fas fa-chart-pie fa-3x text-primary opacity-25"></i>
-                        </div>
-                    </div>
-                </div>
+    <!-- Header -->
+    <div class="row mb-4">
+        <div class="col-12 d-flex justify-content-between align-items-center">
+            <div>
+                <h1 class="h2 text-primary">
+                    <i class="fas fa-graduation-cap me-2"></i>PO Attainment
+                </h1>
+                <p class="text-muted">Analyze and track Program Outcome attainment levels</p>
+            </div>
+            <div class="icon-float d-none d-md-block">
+                <i class="fas fa-chart-pie fa-3x text-primary opacity-25"></i>
             </div>
         </div>
-
-        <!-- Course Selection Card with Glassmorphism -->
-        <div class="row mb-4">
-            <div class="col-12">
-                <div class="card card-modern border-0 shadow-modern-hover glass-card" data-aos="fade-up" data-aos-duration="800">
-                    <div class="card-header-modern">
-                        <h5 class="mb-0">
-                            <i class="fas fa-search me-2"></i>Select Course for Analysis
-                        </h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <form method="get" action="{% url 'po_attainment' %}" class="row g-3 align-items-end">
-                            <div class="col-md-8">
-                                <label for="course_id" class="form-label fw-semibold">
-                                    <i class="fas fa-book me-1"></i>Course Selection
-                                </label>
-                                <select name="course_id" id="course_id" 
-                                        class="form-select form-control-modern floating-select" required>
-                                    <option value="">-- Choose a Course --</option>
-                                    {% for course in courses %}
-                                        <option value="{{ course.id }}" 
-                                                {% if selected_course and selected_course.id == course.id %}selected{% endif %}>
-                                            {{ course.code }} - {{ course.name }}
-                                        </option>
-                                    {% endfor %}
-                                </select>
-                            </div>
-                            <div class="col-md-4">
-                                <button type="submit" style="color: black;" class="btn btn-primary-modern btn-modern w-100 ripple-effect">
-                                    <i class="fas fa-calculator me-2"></i>Calculate & View
-                                </button>
-                            </div>
-                        </form>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        {% if selected_course %}
-        <!-- Results Section with Enhanced Animations -->
-        <div class="row">
-            <div class="col-12">
-                <!-- Course Info Card with Parallax Effect -->
-                <div class="card card-modern border-0 shadow-modern-hover mb-4" data-aos="fade-up" data-aos-delay="200" data-aos-duration="800">
-                    <div class="card-header-modern">
-                        <h5 class="mb-0">
-                            <i class="fas fa-info-circle me-2"></i>Analysis Results
-                        </h5>
-                    </div>
-                    <div class="card-body p-4">
-                        <div class="row align-items-center">
-                            <div class="col-md-8">
-                                <h4 class="text-primary mb-1">{{ selected_course.code }}</h4>
-                                <h6 class="text-muted mb-0">{{ selected_course.name }}</h6>
-                            </div>
-                            <div class="col-md-4 text-md-end">
-                                <span class="badge bg-primary fs-6 pulse-animation">
-                                    <i class="fas fa-chart-bar me-1"></i>{{ attainment_data|length }} POs Analyzed
-                                </span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Enhanced Attainment Results with Staggered Animations -->
-                <div class="card card-modern border-0 shadow-modern-hover" data-aos="fade-up" data-aos-delay="300" data-aos-duration="800">
-                    <div class="card-header-modern">
-                        <h5 class="mb-0">
-                            <i class="fas fa-table me-2"></i>PO Attainment Details
-                        </h5>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-modern mb-0">
-                                <thead>
-                                    <tr>
-                                        <th class="text-center">
-                                            <i class="fas fa-hashtag me-1"></i>PO Number
-                                        </th>
-                                        <th>
-                                            <i class="fas fa-align-left me-1"></i>Description
-                                        </th>
-                                        <th class="text-center">
-                                            <i class="fas fa-chart-line me-1"></i>Average Level
-                                        </th>
-                                        <th class="text-center">
-                                            <i class="fas fa-flag me-1"></i>Status
-                                        </th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    {% for item in attainment_data %}
-                                    <tr class="fade-in-row" data-aos="fade-up" data-aos-delay="{{ forloop.counter0|add:100 }}" data-aos-duration="600">
-                                        <td class="text-center">
-                                            <span class="badge bg-primary fs-6 glow-badge">{{ item.po_number }}</span>
-                                        </td>
-                                        <td>
-                                            <p class="mb-0 fw-medium">{{ item.po_description }}</p>
-                                        </td>
-                                        <td class="text-center">
-                                            <div class="d-flex flex-column align-items-center">
-                                                <span class="h5 mb-1 text-primary fw-bold level-counter">{{ item.level|floatformat:2 }}</span>
-                                                <div class="progress w-100 progress-modern" style="height: 8px;">
-                                                    <div class="progress-bar bg-primary progress-fill" 
-                                                         data-width="{% widthratio item.level 3 100 %}"
-                                                         style="width: 0%"></div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td class="text-center">
-                                            {% if item.level >= 2.5 %}
-                                                <span class="badge bg-success fs-6 pulse-animation status-badge">
-                                                    <i class="fas fa-check-circle me-1"></i>High
-                                                </span>
-                                            {% elif item.level > 1.5 %}
-                                                <span class="badge bg-warning fs-6 status-badge">
-                                                    <i class="fas fa-exclamation-triangle me-1"></i>Medium
-                                                </span>
-                                            {% else %}
-                                                <span class="badge bg-danger fs-6 status-badge">
-                                                    <i class="fas fa-times-circle me-1"></i>Low
-                                                </span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                    {% empty %}
-                                    <tr>
-                                        <td colspan="4" class="text-center py-4">
-                                            <div class="empty-state">
-                                                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
-                                                <p class="text-muted mb-0">No PO data available for this course</p>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    {% endfor %}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Enhanced Summary Cards with Interactive Hover Effects -->
-                {% if attainment_data %}
-                <div class="row mt-4">
-                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="400" data-aos-duration="600">
-                        <div class="stats-card interactive-card">
-                            <div class="stats-number text-success counter" data-target="{{ attainment_data|length }}">
-                                0
-                            </div>
-                            <div class="stats-label">Total POs</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="500" data-aos-duration="600">
-                        <div class="stats-card interactive-card">
-                            <div class="stats-number text-primary counter" id="highCount" data-target="0">
-                                0
-                            </div>
-                            <div class="stats-label">High Attainment (>=2.5)</div>
-                        </div>
-                    </div>
-                    <div class="col-md-4" data-aos="fade-up" data-aos-delay="600" data-aos-duration="600">
-                        <div class="stats-card interactive-card">
-                            <div class="stats-number text-warning counter" id="avgLevel" data-target="{{ average_level|floatformat:2 }}">
-                                0
-                            </div>
-                            <div class="stats-label">Average Level</div>
-                        </div>
-                    </div>
-                </div>
-                {% endif %}
-            </div>
-        </div>
-        {% endif %}
     </div>
+
+    <!-- Course Selection -->
+    <div class="row mb-4">
+        <div class="col-12">
+            <div class="card glass-card shadow-modern-hover">
+                <div class="card-header">
+                    <h5><i class="fas fa-search me-2"></i>Select Course</h5>
+                </div>
+                <div class="card-body">
+                    <form method="get" action="{% url 'po_attainment' %}" class="row g-3">
+                        <div class="col-md-8">
+                            <label for="course_id" class="form-label">
+                                <i class="fas fa-book me-1"></i>Course
+                            </label>
+                            <select id="course_id" name="course_id" class="form-select" required>
+                                <option value="">-- Choose a Course --</option>
+                                {% for course in courses %}
+                                <option value="{{ course.id }}"
+                                    {% if selected_course and selected_course.id == course.id %}selected{% endif %}>
+                                    {{ course.code }} - {{ course.name }}
+                                </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <button type="submit" class="btn btn-primary w-100 ripple-effect">
+                                <i class="fas fa-calculator me-2"></i>Calculate & View
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    {% if selected_course %}
+    <!-- Results Section -->
+    <div id="results-section" class="row">
+        <div class="col-12">
+            <div class="card shadow-modern-hover mb-4">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h5><i class="fas fa-info-circle me-2"></i>Analysis Results</h5>
+                    <button id="download-pdf" class="btn btn-success btn-sm">
+                        <i class="fas fa-download me-2"></i>Download PDF
+                    </button>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex justify-content-between align-items-center mb-3">
+                        <div>
+                            <h4 class="text-primary">{{ selected_course.code }}</h4>
+                            <h6 class="text-muted">{{ selected_course.name }}</h6>
+                        </div>
+                        <span class="badge bg-primary fs-6">
+                            <i class="fas fa-chart-bar me-1"></i>{{ attainment_data|length }} POs
+                        </span>
+                    </div>
+
+                    <!-- PO Table -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-bordered">
+                            <thead class="table-primary">
+                                <tr>
+                                    <th class="text-center">PO Number</th>
+                                    <th>Description</th>
+                                    <th class="text-center">Average Level</th>
+                                    <th class="text-center">Status</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for item in attainment_data %}
+                                <tr>
+                                    <td class="text-center">{{ item.po_number }}</td>
+                                    <td>{{ item.po_description }}</td>
+                                    <td class="text-center">{{ item.level|floatformat:2 }}</td>
+                                    <td class="text-center">
+                                        {% if item.level >= 2.5 %}
+                                        <span class="badge bg-success">High</span>
+                                        {% elif item.level > 1.5 %}
+                                        <span class="badge bg-warning">Medium</span>
+                                        {% else %}
+                                        <span class="badge bg-danger">Low</span>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                {% empty %}
+                                <tr>
+                                    <td colspan="4" class="text-center py-4">
+                                        <i class="fas fa-inbox fa-2x text-muted mb-2"></i>
+                                        <p class="text-muted mb-0">No PO data available</p>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- Summary Cards -->
+                    {% if attainment_data %}
+                    <div class="row mt-4 text-center">
+                        <div class="col-md-4 mb-3">
+                            <div class="card p-3 shadow-modern-hover">
+                                <h5>Total POs</h5>
+                                <h3>{{ attainment_data|length }}</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card p-3 shadow-modern-hover">
+                                <h5>High Attainment (>=2.5)</h5>
+                                <h3 id="highCount">0</h3>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3">
+                            <div class="card p-3 shadow-modern-hover">
+                                <h5>Average Level</h5>
+                                <h3>{{ average_level|floatformat:2 }}</h3>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endif %}
 </div>
 
+<!-- Styles -->
 <style>
-/* Enhanced Modern Animations and Styles */
-body,
-.card-modern,
-.glass-card,
-.table-modern,
-.card-header-modern,
-.stats-card,
-.stats-label,
-.level-counter,
-.text-primary,
-.text-muted {
-    color: #222 !important;
-    background-color: #fff !important;
-}
-
-/* For table headers and cells */
-.table-modern th,
-.table-modern td {
-    color: #222 !important;
-    background-color: #fff !important;
-}
-
-/* For glassmorphism cards in light mode */
 .glass-card {
-    background: rgba(255,255,255,0.85) !important;
-    color: #222 !important;
-}
-
-/* For card headers */
-.card-header-modern {
-    background: rgba(245,245,245,0.95) !important;
-    color: #222 !important;
-}
-/* Glassmorphism Effects */
-.glass-card {
-    background: rgba(255, 255, 255, 0.25);
+    background: rgba(255,255,255,0.25);
     backdrop-filter: blur(10px);
-    border: 1px solid rgba(255, 255, 255, 0.18);
-}
-
-/* Floating Animation */
-@keyframes float {
-    0%, 100% { transform: translateY(0px); }
-    50% { transform: translateY(-10px); }
-}
-
-.icon-float {
-    animation: float 3s ease-in-out infinite;
-}
-
-/* Glow Effects */
-.glow-badge {
-    box-shadow: 0 0 20px rgba(37, 99, 235, 0.5);
-    animation: glow 2s ease-in-out infinite alternate;
-}
-
-@keyframes glow {
-    from { box-shadow: 0 0 20px rgba(37, 99, 235, 0.5); }
-    to { box-shadow: 0 0 30px rgba(37, 99, 235, 0.8); }
-}
-
-/* Ripple Effect */
-.ripple-effect {
-    position: relative;
-    overflow: hidden;
-}
-
-.ripple-effect::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    border-radius: 50%;
-    background: rgba(255, 255, 255, 0.3);
-    transform: translate(-50%, -50%);
-    transition: width 0.6s, height 0.6s;
-}
-
-.ripple-effect:active::after {
-    width: 300px;
-    height: 300px;
-}
-
-/* Enhanced Progress Bars */
-.progress-modern {
-    background: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(255,255,255,0.18);
     border-radius: 10px;
-    overflow: hidden;
 }
-
-.progress-fill {
-    background: linear-gradient(45deg, #007bff, #0056b3);
-    border-radius: 10px;
-    transition: width 1.5s ease-in-out;
-}
-
-/* Interactive Cards */
-.interactive-card {
-    cursor: pointer;
-    transition: all 0.3s ease;
-}
-
-.interactive-card:hover {
-    transform: translateY(-5px) scale(1.02);
-    box-shadow: 0 15px 35px rgba(0, 0, 0, 0.2);
-}
-
-/* Staggered Row Animations */
-.fade-in-row {
-    opacity: 0;
-    transform: translateY(20px);
-    animation: fadeInRow 0.6s ease forwards;
-}
-
-.fade-in-row:nth-child(1) { animation-delay: 0.1s; }
-.fade-in-row:nth-child(2) { animation-delay: 0.2s; }
-.fade-in-row:nth-child(3) { animation-delay: 0.3s; }
-.fade-in-row:nth-child(4) { animation-delay: 0.4s; }
-.fade-in-row:nth-child(5) { animation-delay: 0.5s; }
-
-@keyframes fadeInRow {
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
-}
-
-/* Status Badge Animations */
-.status-badge {
-    transition: all 0.3s ease;
-}
-
-.status-badge:hover {
-    transform: scale(1.1);
-    filter: brightness(1.2);
-}
-
-/* Empty State */
-.empty-state {
-    padding: 3rem;
-    text-align: center;
-}
-
-.empty-state i {
-    animation: pulse 2s infinite;
-}
-
-/* Floating Select Enhancement */
-.floating-select {
-    transition: all 0.3s ease;
-}
-
-.floating-select:focus {
-    transform: scale(1.02);
-    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
-}
-
-/* Counter Animation */
-.counter {
-    font-weight: 700;
-    transition: all 0.5s ease;
-}
-
-/* Level Counter Animation */
-.level-counter {
-    transition: all 0.3s ease;
-}
-
-.level-counter:hover {
-    transform: scale(1.1);
-    color: #0056b3;
-}
-
-/* Responsive Enhancements */
-@media (max-width: 768px) {
-    .stats-card {
-        margin-bottom: 1rem;
-    }
-    
-    .interactive-card {
-        margin-bottom: 1rem;
-    }
-    
-    .table-responsive {
-        border-radius: 0.5rem;
-    }
-}
-
-/* Dark Mode Support */
-@media (prefers-color-scheme: dark) {
-    .glass-card {
-        background: rgba(30, 41, 59, 0.25);
-        border-color: rgba(255, 255, 255, 0.1);
-    }
-    
-    .card-modern {
-        background: rgba(30, 41, 59, 0.95);
-    }
-}
+.icon-float { animation: float 3s ease-in-out infinite; }
+@keyframes float { 0%,100%{transform:translateY(0)}50%{transform:translateY(-10px)} }
+.ripple-effect { position: relative; overflow: hidden; }
+.ripple-effect::after { content: ''; position: absolute; border-radius: 50%; background: rgba(255,255,255,0.3); transform: scale(0); transition: transform 0.6s; }
+.ripple-effect:active::after { transform: scale(4); }
 </style>
 
+<!-- HTML2PDF -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize AOS (Animate On Scroll)
-    if (typeof AOS !== 'undefined') {
-        AOS.init({
-            duration: 800,
-            once: true,
-            offset: 100
+    const downloadBtn = document.getElementById('download-pdf');
+    if (downloadBtn) {
+        downloadBtn.addEventListener('click', function() {
+            downloadBtn.disabled = true;
+            downloadBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating PDF...';
+
+            const element = document.getElementById('results-section');
+
+            html2pdf().set({
+                margin: 10,
+                filename: 'po_attainment.pdf',
+                image: { type: 'png', quality: 1.0 },
+                html2canvas: { scale: 5, useCORS: true, letterRendering: true, scrollY: 0 },
+                jsPDF: { unit: 'mm', format: 'a4', orientation: 'landscape' }
+            }).from(element).save().finally(() => {
+                downloadBtn.disabled = false;
+                downloadBtn.innerHTML = '<i class="fas fa-download me-2"></i>Download PDF';
+            });
         });
     }
-
-    // Counter Animation for Stats Cards
-    function animateCounter(element, target) {
-        const duration = 2000;
-        const start = 0;
-        const increment = target / (duration / 16);
-        let current = start;
-        
-        const timer = setInterval(function() {
-            current += increment;
-            if (current >= target) {
-                current = target;
-                clearInterval(timer);
-            }
-            element.textContent = Math.floor(current);
-        }, 16);
-    }
-
-    // Animate progress bars
-    function animateProgressBars() {
-        const progressBars = document.querySelectorAll('.progress-fill');
-        progressBars.forEach(function(bar) {
-            const width = bar.dataset.width || 0;
-            setTimeout(function() {
-                bar.style.width = width + '%';
-            }, 500);
-        });
-    }
-
-    // Animate counters
-    function animateCounters() {
-        const counters = document.querySelectorAll('.counter');
-        counters.forEach(function(counter) {
-            const target = parseFloat(counter.dataset.target) || 0;
-            if (target > 0) {
-                animateCounter(counter, target);
-            }
-        });
-    }
-
-    // Calculate and animate high attainment count
-    function calculateHighAttainment() {
-        const rows = document.querySelectorAll('table.table-modern tbody tr');
-        let highCount = 0;
-        
-        rows.forEach(function(row) {
-            const levelText = row.querySelector('.level-counter')?.textContent || '0';
-            const level = parseFloat(levelText);
-            if (level >= 2.5) highCount++;
-        });
-
-        const highCountElement = document.getElementById('highCount');
-        if (highCountElement) {
-            highCountElement.dataset.target = highCount;
-            animateCounter(highCountElement, highCount);
-        }
-    }
-
-    // Initialize animations
-    setTimeout(function() {
-        animateProgressBars();
-        animateCounters();
-        calculateHighAttainment();
-    }, 1000);
-
-    // Add hover effects to table rows
-    const tableRows = document.querySelectorAll('.table-modern tbody tr');
-    tableRows.forEach(function(row) {
-        row.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.02)';
-        });
-        
-        row.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
-        });
-    });
-
-    // Add click ripple effect to buttons
-    const buttons = document.querySelectorAll('.ripple-effect');
-    buttons.forEach(function(button) {
-        button.addEventListener('click', function(e) {
-            const ripple = document.createElement('span');
-            const rect = this.getBoundingClientRect();
-            const size = Math.max(rect.width, rect.height);
-            const x = e.clientX - rect.left - size / 2;
-            const y = e.clientY - rect.top - size / 2;
-            
-            ripple.style.width = size + 'px';
-            ripple.style.height = size + 'px';
-            ripple.style.left = x + 'px';
-            ripple.style.top = y + 'px';
-            ripple.classList.add('ripple');
-            
-            this.appendChild(ripple);
-            
-            setTimeout(function() {
-                ripple.remove();
-            }, 600);
-        });
-    });
-
-    // Add floating animation to badges
-    const badges = document.querySelectorAll('.glow-badge');
-    badges.forEach(function(badge) {
-        badge.addEventListener('mouseenter', function() {
-            this.style.transform = 'scale(1.2)';
-        });
-        
-        badge.addEventListener('mouseleave', function() {
-            this.style.transform = 'scale(1)';
-        });
-    });
 });
-
-// Add ripple styles dynamically
-const style = document.createElement('style');
-style.textContent = `
-    .ripple {
-        position: absolute;
-        border-radius: 50%;
-        background: rgba(255, 255, 255, 0.6);
-        transform: scale(0);
-        animation: ripple-animation 0.6s linear;
-        pointer-events: none;
-    }
-    
-    @keyframes ripple-animation {
-        to {
-            transform: scale(4);
-            opacity: 0;
-        }
-    }
-`;
-document.head.appendChild(style);
 </script>
-
 {% endblock %}
