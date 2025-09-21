@@ -81,6 +81,56 @@
         color: #e74c3c;
         font-size: 0.9rem;
     }
+
+    /* Messages/Alert styling */
+    .alert {
+        border: none;
+        border-radius: 12px;
+        font-weight: 500;
+        margin-bottom: 1.5rem;
+        padding: 1rem 1.25rem;
+        position: relative;
+        flex-direction: column;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        transition: all 0.3s ease;
+    }
+
+    .alert-success {
+        background: linear-gradient(45deg, #28a745, #20c997);
+        color: #fff;
+    }
+
+    .alert-error,
+    .alert-danger {
+        background: linear-gradient(45deg, #dc3545, #fd7e14);
+        color: #fff;
+    }
+
+    .alert-warning {
+        background: linear-gradient(45deg, #ffc107, #fd7e14);
+        color: #212529;
+    }
+
+    .alert-info {
+        background: linear-gradient(45deg, #17a2b8, #6f42c1);
+        color: #fff;
+    }
+
+    .alert-dismissible .btn-close {
+        background: rgba(255, 255, 255, 0.2);
+        border-radius: 50%;
+        color: #fff;
+        font-size: 0.8rem;
+        opacity: 0.8;
+        padding: 0.5rem;
+        transition: all 0.2s ease;
+    }
+
+    .alert-dismissible .btn-close:hover {
+        background: rgba(255, 255, 255, 0.3);
+        opacity: 1;
+        transform: scale(1.1);
+    }
 </style>
 
 <div class="modern-container" style="margin-top: 30px;">
